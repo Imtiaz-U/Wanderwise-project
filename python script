@@ -1,9 +1,11 @@
+##libraries
 import os
 from dotenv import load_dotenv
-
+##variable##
+api_key = os.getenv("GROQ_API_KEY")
 # Load our hidden secrets (like API keys) from the .env file so the code can use them safely
 load_dotenv()
-
+##subprograms
 def main():
     print("======================================")
     print("        Welcome to Wanderwise         ")
