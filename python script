@@ -1,21 +1,9 @@
-import os
-from dotenv import load_dotenv
+##libraries
 
-# Load the hidden secrets (like API keys, abrar's biggest secret) from the .env file so the code can use them safely
-load_dotenv()
 
-def main():
-    print("======================================")
-    print("        Welcome to Wanderwise         ")
-    print("======================================")
-    
-    # Ask the user where they want to go and save their answer
-    destination = input("\nWhere would you like to travel to? ")
-    
-    # Print a friendly message using the destination they just typed
-    print(f"\nHello! Get ready to explore {destination}.")
-    print("Your AI-powered itinerary is being prepared...\n")
+##variables
+destination = input("enter your desired destination:")
+##subprograms
 
-# This checks if we are running this exact file, rather than importing it somewhere else. If so, it starts the app.
-if __name__ == "__main__":
-    main()
+##main program
+print("hello")
