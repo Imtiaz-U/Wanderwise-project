@@ -5,9 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def main():
-    print("======================================")
     print("        Welcome to Wanderwise         ")
-    print("======================================")
     
     # Ask the user where they want to go and save their answer
     destination = input("\nWhere would you like to travel to? ")
