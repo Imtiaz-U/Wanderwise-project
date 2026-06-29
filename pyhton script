@@ -1,4 +1,0 @@
-destination = input("Where would you like to go?")
-
-
-print("hello")
