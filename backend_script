@@ -21,9 +21,6 @@ client = Groq(api_key=api_key)
 
 
 ##subprograms
-<<<<<<< HEAD
-def main(destination,dates,budget,interests,travel_style):
-=======
 
 def get_valid_budget():
     # Keep asking the user until they give us a proper number
@@ -73,7 +70,6 @@ def generate_itinerary(destination, dates, budget, interests, travel_style):
         return f"Oops! We had trouble connecting to the AI. Here is the error: {error_message}"
 
 def main():
->>>>>>> robust-program-branch
     print("======================================")
     print("        Welcome to Wanderwise         ")
     print("======================================")
@@ -83,14 +79,10 @@ def main():
     
     # Get the rest of the details needed for the brief
     dates = input("When are you going and for how long? ")
-<<<<<<< HEAD
-    budget = float(input("What is your total budget? £"))
-=======
 
     # Use our robust function to get the budget safely
     budget = get_valid_budget()
 
->>>>>>> robust-program-branch
     interests = input("What kind of things are you interested in? ")
     travel_style = input("What is your travel style? (e.g. budget, luxury, adventure) ")
 
@@ -100,29 +92,6 @@ def main():
     print(f"\nHello! Get ready to explore {destination}.")
     print("Your AI-powered itinerary is being prepared...\n")
 
-<<<<<<< HEAD
-    # This makes the call to the AI with our variables. This sends our prompt over the network.
-    response = client.chat.completions.create(
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful travel assistant. Make a short, bullet-point itinerary."
-            },
-            {
-                "role": "user",
-                "content": f"Make a trip to {destination} for {dates}. My budget is £{budget} and I like {interests}, and my travel style is {travel_style}."
-            }
-        ],
-        model="llama-3.3-70b-versatile",
-        max_tokens=1000 # I put a hard limit here to make sure we stay within our token limit
-    )
-
-    print("\n=== Here is your itinerary ===")
-    print(response.choices[0].message.content)
-    print("\n==============================")
-
-
-=======
      # This makes the call to the AI with our variables
     itinerary = generate_itinerary(destination, dates, budget, interests, travel_style)
 
@@ -132,7 +101,6 @@ def main():
 
 
 
->>>>>>> robust-program-branch
 # This checks if we are running this exact file, rather than importing it somewhere else. If so, it starts the app.
 if __name__ == "__main__":
     main()
