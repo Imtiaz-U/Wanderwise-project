@@ -54,7 +54,7 @@ def main():
             }
         ],
         model="llama-3.3-70b-versatile",
-        max_tokens=400 # I put a hard limit here to make sure we stay within our token limit
+        max_tokens=1000 # I put a hard limit here to make sure we stay within our token limit
     )
 
     print("\n=== Here is your itinerary ===")
