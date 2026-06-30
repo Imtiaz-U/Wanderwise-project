@@ -21,7 +21,7 @@ client = Groq(api_key=api_key)
 
 
 ##subprograms
-def main():
+def main(destination,dates,budget,interests,travel_style):
     print("======================================")
     print("        Welcome to Wanderwise         ")
     print("======================================")

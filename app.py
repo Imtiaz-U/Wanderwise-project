@@ -1,5 +1,5 @@
 import streamlit as st
-from (python script.py) import main(dates, budget ,interests, travel_style)
+from backend.py import main()
 
 st.title("Wanderwise")
 st.header("your personal travel assistant")
