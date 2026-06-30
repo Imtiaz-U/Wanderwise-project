@@ -33,6 +33,8 @@ def main():
     dates = input("When are you going and for how long? ")
     budget = float(input("What is your total budget? £"))
     interests = input("What kind of things are you interested in? ")
+    travel_style = input("What is your travel style? (e.g. budget, luxury, adventure) ")
+
 
 
     # Print a friendly message using the destination they just typed
@@ -48,7 +50,7 @@ def main():
             },
             {
                 "role": "user",
-                "content": f"Make a trip to {destination} for {dates}. My budget is £{budget} and I like {interests}."
+                "content": f"Make a trip to {destination} for {dates}. My budget is £{budget} and I like {interests}, and my travel style is {travel_style}."
             }
         ],
         model="llama-3.3-70b-versatile",
