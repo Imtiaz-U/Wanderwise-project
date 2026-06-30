@@ -1,7 +1,7 @@
 import streamlit as st
-from (python script.py) import main()
 
-st.title("Wanderwise")
-st.header("your personal travel assistant")
+st.title("Welcome to Wanderwise")
+st.markdown("Your personal travel assistant")
 
-main()
+if st.button("Create an itinerary"):
+    st.markdown(main())
