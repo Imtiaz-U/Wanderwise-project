@@ -3,6 +3,9 @@ import os
 from dotenv import load_dotenv
 import sys
 from groq import Groq
+# Pulling in the specific error types Groq can throw, so we can react differently
+# depending on what actually went wrong (rate limit vs. no internet vs. server is down, etc.)
+from groq import APIConnectionError, APITimeoutError, RateLimitError, APIStatusError, GroqError
 
 # Load our hidden secrets (like API keys, like abrar's secret keys) from the .env file so the code can use them safely
 load_dotenv()
@@ -37,13 +40,25 @@ def get_valid_budget():
             if budget <= 0:
                 print("Please enter a budget greater than zero.")
             else:
-                # If we got here, the budget is good! We can break the loop.
                 budget_is_valid = True
                 return budget
                 
         except ValueError:
             # If the float conversion breaks (for example, they typed 'five'), this catches the error
             print("Invalid input. Please type a number like 500 or 1250.50")
+
+
+def get_required_text(prompt_message):
+    # We  need SOMETHING here - we can't send an empty string off to the AI and expect a trip back.
+    while True:
+        user_input = input(prompt_message).strip()
+
+        if user_input == "":
+            # We're using the function .strip() which means "   " (just spaces) and also counts as empty, not just ""
+            print("This can't be left empty - please type an answer.")
+        else:
+            return user_input
+
 
 def generate_itinerary(destination, dates, budget, interests, travel_style):
     # We put this in a try block just in case the internet drops or the AI crashes
@@ -62,9 +77,36 @@ def generate_itinerary(destination, dates, budget, interests, travel_style):
             model="llama-3.3-70b-versatile",
             max_tokens=1000 
         )
+
+        # Sometimes an API can technically succeed but hand back something unexpected
+        # (e.g. no choices at all) - better to check than to crash on response.choices[0]
+        if not response.choices:
+            return "Hmm, the AI didn't send back any suggestions that time. Please try again."
+
         # Give back the text the AI generated
         return response.choices[0].message.content
-    
+
+    # These errors are ordered from  most-specific to least-specific, since Python checks them top to bottom.
+    except APITimeoutError:
+        # The request took too long and gave up - usually a slow connection or a busy server
+        return "Oops! The request to the AI timed out. Please check your connection and try again."
+
+    except APIConnectionError:
+        # We couldn't even reach Groq's servers - likely no internet 
+        return "Oops! We couldn't connect to the AI. Please check your internet connection and try again."
+
+    except RateLimitError:
+        # We've sent too many requests too quickly
+        return "Oops! We've hit the AI's rate limit. Please wait a moment and try again."
+
+    except APIStatusError as error_message:
+        # Groq's servers responded, but with an error status (e.g. bad request, server error)
+        return f"Oops! The AI service returned an error (status {error_message.status_code}). Please try again later."
+
+    except GroqError as error_message:
+        # A catch-all for any other Groq-specific issue we haven't handled above
+        return f"Oops! Something went wrong talking to the AI. Here is the error: {error_message}"
+
     except Exception as error_message:
         # If something goes wrong, tell the user instead of crashing the whole app
         return f"Oops! We had trouble connecting to the AI. Here is the error: {error_message}"
@@ -75,16 +117,16 @@ def main():
     print("======================================")
     
     # Ask the user where they want to go and save their answer
-    destination = input("\nWhere would you like to travel to? ")
+    destination = get_required_text("\nWhere would you like to travel to? ")
     
     # Get the rest of the details needed for the brief
-    dates = input("When are you going and for how long? ")
+    dates = get_required_text("When are you going and for how long? ")
 
     # Use our robust function to get the budget safely
     budget = get_valid_budget()
 
-    interests = input("What kind of things are you interested in? ")
-    travel_style = input("What is your travel style? (e.g. budget, luxury, adventure) ")
+    interests = get_required_text("What kind of things are you interested in? ")
+    travel_style = get_required_text("What is your travel style? (e.g. budget, luxury, adventure) ")
 
 
 
