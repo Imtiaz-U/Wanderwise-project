@@ -21,7 +21,55 @@ client = Groq(api_key=api_key)
 
 
 ##subprograms
-def main(destination,dates,budget,interests,travel_style):
+
+def get_valid_budget():
+    # Keep asking the user until they give us a proper number
+    budget_is_valid = False
+    
+    while budget_is_valid == False:
+        user_input = input("What is your total budget? £")
+        
+        try:
+            # Try to turn their answer into a decimal number
+            budget = float(user_input)
+            
+            # Check if it is a negative number or zero
+            if budget <= 0:
+                print("Please enter a budget greater than zero.")
+            else:
+                # If we got here, the budget is good! We can break the loop.
+                budget_is_valid = True
+                return budget
+                
+        except ValueError:
+            # If the float conversion breaks (for example, they typed 'five'), this catches the error
+            print("Invalid input. Please type a number like 500 or 1250.50")
+
+def generate_itinerary(destination, dates, budget, interests, travel_style):
+    # We put this in a try block just in case the internet drops or the AI crashes
+    try:
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful travel assistant. Make a short, bullet-point itinerary."
+                },
+                {
+                    "role": "user",
+                    "content": f"Make a trip to {destination} for {dates}. My budget is £{budget}, I like {interests}, and my travel style is {travel_style}."
+                }
+            ],
+            model="llama-3.3-70b-versatile",
+            max_tokens=1000 
+        )
+        # Give back the text the AI generated
+        return response.choices[0].message.content
+    
+    except Exception as error_message:
+        # If something goes wrong, tell the user instead of crashing the whole app
+        return f"Oops! We had trouble connecting to the AI. Here is the error: {error_message}"
+
+def main():
     print("======================================")
     print("        Welcome to Wanderwise         ")
     print("======================================")
@@ -31,7 +79,10 @@ def main(destination,dates,budget,interests,travel_style):
     
     # Get the rest of the details needed for the brief
     dates = input("When are you going and for how long? ")
-    budget = float(input("What is your total budget? £"))
+
+    # Use our robust function to get the budget safely
+    budget = get_valid_budget()
+
     interests = input("What kind of things are you interested in? ")
     travel_style = input("What is your travel style? (e.g. budget, luxury, adventure) ")
 
@@ -41,25 +92,13 @@ def main(destination,dates,budget,interests,travel_style):
     print(f"\nHello! Get ready to explore {destination}.")
     print("Your AI-powered itinerary is being prepared...\n")
 
-    # This makes the call to the AI with our variables. This sends our prompt over the network.
-    response = client.chat.completions.create(
-        messages=[
-            {
-                "role": "system",
-                "content": "You are a helpful travel assistant. Make a short, bullet-point itinerary."
-            },
-            {
-                "role": "user",
-                "content": f"Make a trip to {destination} for {dates}. My budget is £{budget} and I like {interests}, and my travel style is {travel_style}."
-            }
-        ],
-        model="llama-3.3-70b-versatile",
-        max_tokens=1000 # I put a hard limit here to make sure we stay within our token limit
-    )
+     # This makes the call to the AI with our variables
+    itinerary = generate_itinerary(destination, dates, budget, interests, travel_style)
 
     print("\n=== Here is your itinerary ===")
-    print(response.choices[0].message.content)
+    print(itinerary)
     print("\n==============================")
+
 
 
 # This checks if we are running this exact file, rather than importing it somewhere else. If so, it starts the app.
