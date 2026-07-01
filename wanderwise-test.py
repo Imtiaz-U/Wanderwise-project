@@ -17,7 +17,7 @@ import pytest
 
 os.environ["GROQ_API_KEY"] = "test-key-not-real"
 
-import wanderwise
+import backend_script as wanderwise
 from groq import APIConnectionError, RateLimitError
 
 
