@@ -2,6 +2,7 @@
 import os
 from dotenv import load_dotenv
 import sys
+import requests
 from groq import Groq
 # Pulling in the specific error types Groq can throw, so we can react differently
 # depending on what actually went wrong (rate limit vs. no internet vs. server is down, etc.)
@@ -140,6 +141,36 @@ def main():
     print("\n=== Here is your itinerary ===")
     print(itinerary)
     print("\n==============================")
+
+def weather(city):
+    print("weather function called")
+    geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=10&language=en&format=json"
+    
+    geo_response = requests.get(geo_url)
+    if geo_response.status_code != 200:
+        return {"error": "Failed to fetch location data"}
+    
+    geo_data = geo_response.json()
+
+
+    if "results" not in geo_data:
+        return{"error": "location not found"}
+    
+
+    location = geo_data["results"][0]
+
+    latitude = location["latitude"]
+    longitude = location["longitude"]
+
+    weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,precipitation&forecast_days=7"
+
+    weather_response = requests.get(weather_url)
+    if weather_response.status_code != 200:
+        return {"error": "Failed to fetch weather data"}
+    
+    current_weather = weather_response.json()
+    return current_weather
+
 
 
 
