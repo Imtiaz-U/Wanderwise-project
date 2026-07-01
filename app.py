@@ -4,10 +4,10 @@ from datetime import date, timedelta
 # weather aliased so it doesn't clash with the weather_info variable below
 from backend_script import generate_itinerary, weather as get_weather
 
-# --- page config ---
+# page config
 st.set_page_config(page_title="Wanderwise", page_icon="🧭", layout="wide")
 
-# --- styling: vintage travel poster, boarding-pass itinerary card ---
+# styling: vintage travel poster, boarding-pass itinerary card 
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap');
@@ -137,7 +137,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# --- inputs ---
+# inputs
 left_col, right_col = st.columns([1, 1])
 
 with left_col:
@@ -162,7 +162,7 @@ interests = st.multiselect(
 
 create_clicked = st.button("Create my itinerary")
 
-# --- output ---
+# output
 if create_clicked:
     # catch empty fields before bothering the AI
     if not destination.strip():
