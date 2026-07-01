@@ -8,6 +8,7 @@ An AI-powered travel assistant that generates personalised travel itineraries.
 - Generates an itinerary using the Groq API.
 - Loads the API key securely from a `.env` file.
 - Detects when the API key is missing.
+- Checks current weather in the user's chosen destination.
 
 ## Planned Features
 
