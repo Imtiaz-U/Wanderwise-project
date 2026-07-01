@@ -1,4 +1,5 @@
 ##libraries
+import json
 import os
 from dotenv import load_dotenv
 import sys
@@ -163,15 +164,17 @@ def weather(city):
     longitude = location["longitude"]
 
     weather_url = f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,precipitation&forecast_days=7"
-
-    weather_response = requests.get(weather_url)
+    
+    
+    weather_response = requests.get(weather_url,)
     if weather_response.status_code != 200:
         return {"error": "Failed to fetch weather data"}
     
     current_weather = weather_response.json()
-    return current_weather
-
-
+    return {
+        "temperature": current_weather["current"]["temperature_2m"],
+        "precipitation": current_weather["current"]["precipitation"]
+    }
 
 
 # This checks if we are running this exact file, rather than importing it somewhere else. If so, it starts the app.
