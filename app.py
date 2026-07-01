@@ -10,4 +10,5 @@ if st.button("Create an itinerary"):
     city = get_required_text("Enter a city name for weather information:")
     print(f"City entered: {city}")  # Debugging line to check the input
     weather_info = weather(city)
-    print(weather_info)
+    st.metric("Temperature (°C)", weather_info["temperature"])
+    st.metric("Precipitation (mm)",weather_info["precipitation"])
