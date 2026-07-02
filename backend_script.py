@@ -61,6 +61,37 @@ def get_required_text(prompt_message):
         else:
             return user_input
 
+def suggest_destination(budget, interests, travel_style):
+    # Ask the AI to pick a destination that fits the user's vibe
+    try:
+        response = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a creative travel expert. Reply in JSON only, no markdown, no explanation."
+                },
+                {
+                    "role": "user",
+                    "content": (
+                        f"Suggest one surprise travel destination for someone with a £{budget} budget, "
+                        f"who likes {interests} and prefers a {travel_style} travel style. "
+                        f'Reply with exactly this JSON: {{"destination": "City, Country", "reason": "one sentence why"}}'
+                    )
+                }
+            ],
+            model="llama-3.3-70b-versatile",
+            max_tokens=100,
+        )
+
+        import json
+        raw = response.choices[0].message.content.strip()
+        data = json.loads(raw)
+        return data  # {"destination": "...", "reason": "..."}
+
+    except Exception:
+        # if anything goes wrong just return None - the button handles it gracefully
+        return None
+
 
 def generate_itinerary(destination, dates, budget, interests, travel_style):
     # We put this in a try block just in case the internet drops or the AI crashes

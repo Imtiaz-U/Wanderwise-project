@@ -1,6 +1,8 @@
 import streamlit as st
 from datetime import date, timedelta
 
+from backend_script import generate_itinerary, weather as get_weather, transcribe_audio, suggest_destination
+
 # weather aliased so it doesn't clash with the weather_info variable below
 from backend_script import generate_itinerary, weather as get_weather, transcribe_audio
 
@@ -131,32 +133,56 @@ if audio_recording is not None:
 st.divider()
 
 # ---- inputs ----
-left_col, right_col = st.columns(2)
+st.markdown("### 1. Tell us your preferences")
+pref_col1, pref_col2 = st.columns(2)
 
-with left_col:
-    # pre-fill with the voice result if we got one, otherwise leave blank
-    destination = st.text_input(
-        "Where would you like to travel to?",
-        value=voice_destination,
-        placeholder="e.g. Lisbon, Portugal",
-    )
-    trip_dates = st.date_input(
-        "When are you going?",
-        value=(date.today() + timedelta(days=30), date.today() + timedelta(days=37)),
-    )
-
-with right_col:
+with pref_col1:
     budget = st.slider("What is your total budget? (£)", min_value=100, max_value=10000, value=1500, step=50)
     travel_style = st.selectbox(
         "What is your travel style?",
         ["Budget", "Mid-range", "Luxury", "Adventure", "Relaxed"],
     )
 
-interests = st.multiselect(
-    "What kind of things are you interested in?",
-    ["Food & drink", "History & culture", "Nature & outdoors", "Nightlife",
-     "Art & museums", "Shopping", "Relaxation", "Architecture"],
-)
+with pref_col2:
+    interests = st.multiselect(
+        "What kind of things are you interested in?",
+        ["Food & drink", "History & culture", "Nature & outdoors", "Nightlife",
+         "Art & museums", "Shopping", "Relaxation", "Architecture"],
+    )
+
+st.markdown("### 2. Choose your destination")
+dest_col, dates_col = st.columns(2)
+
+with dest_col:
+    # session state lets the surprise destination survive the page re-run
+    if "destination_value" not in st.session_state:
+        st.session_state.destination_value = ""
+
+    surprise_col, _ = st.columns([1, 2])
+    with surprise_col:
+        if st.button("🎲 Surprise me!"):
+            if not interests:
+                st.warning("Pick some interests first so we can find you somewhere good.")
+            else:
+                with st.spinner("Finding you somewhere interesting..."):
+                    suggestion = suggest_destination(budget, ", ".join(interests), travel_style)
+                if suggestion:
+                    st.session_state.destination_value = suggestion["destination"]
+                    st.success(f'✨ {suggestion["reason"]}')
+                else:
+                    st.error("Couldn't come up with one - try again!")
+
+    destination = st.text_input(
+        "Where would you like to travel to?",
+        value=st.session_state.destination_value or voice_destination,
+        placeholder="e.g. Lisbon, Portugal",
+    )
+
+with dates_col:
+    trip_dates = st.date_input(
+        "When are you going?",
+        value=(date.today() + timedelta(days=30), date.today() + timedelta(days=37)),
+    )
 
 create_clicked = st.button("Create my itinerary")
 
