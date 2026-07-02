@@ -144,7 +144,6 @@ def main():
     print("\n==============================")
 
 def weather(city):
-    print("weather function called")
     geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=10&language=en&format=json"
     
     geo_response = requests.get(geo_url)
@@ -171,10 +170,35 @@ def weather(city):
         return {"error": "Failed to fetch weather data"}
     
     current_weather = weather_response.json()
-    return {
-        "temperature": current_weather["current"]["temperature_2m"],
-        "precipitation": current_weather["current"]["precipitation"]
-    }
+
+    try:
+        return {
+            "temperature": current_weather["current"]["temperature_2m"],
+            "precipitation": current_weather["current"]["precipitation"]
+        }
+    except KeyError:
+        # Open-Meteo sent something back but not in the shape we expected
+        return {"error": "Unexpected response from weather service"}
+
+
+# --- NEW: speech-to-text via Groq Whisper ---
+def transcribe_audio(audio_bytes):
+    # Send the raw audio bytes off to Whisper and get back a string
+    try:
+        transcription = client.audio.transcriptions.create(
+            file=("recording.wav", audio_bytes, "audio/wav"),
+            model="whisper-large-v3-turbo",
+            response_format="text",
+        )
+        # Whisper returns a plain string when response_format is "text"
+        return transcription.strip()
+
+    except APIConnectionError:
+        return ""  # no internet - just return empty so the field stays blank
+    except RateLimitError:
+        return ""  # hit the limit - same deal, don't crash
+    except Exception:
+        return ""  # anything else unexpected - fail silently
 
 
 # This checks if we are running this exact file, rather than importing it somewhere else. If so, it starts the app.
